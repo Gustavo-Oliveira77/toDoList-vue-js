@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TODO com with VueJS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Raleway:wght@200&family=Roboto:wght@100&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="app.css" />
+    <!-- trazendo o vue via cdn -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  </head>
+
+  <body>
+    <div class="container" id="app">
+      <header>
+        <!-- variavel nome foi declarada em data e estou chamando ela aqui -->
+        <h1>{{ name }}</h1>
+        <div class="avatar"></div>
+      </header>
+
+      <div class="panel">
+        <!-- v-model="task" é o valor a ser digitado no campo de input e ele vai ser pego no v-on:click="addTask" -->
+        <input type="text" v-model="task" placeholder="Digite uma tarefa" />
+        <button v-on:click="addTask" class="add-task">+</button>
+        <!-- o v-on:click ele chama A FUNÇÃO adc tarefa -->
+      </div>
+      <!-- v-if funciona como um toogle  -->
+      <h5 v-if="todos.length > 0">SUAS TAREFAS:</h5>
+      <!-- mostrar tarefas so se o todos.length for > 0 -->
+
+      <!-- se ele for = 0 mostrar que n existem tarefas -->
+      <h5 v-if="todos.length == 0">NÃO EXISTEM TAREFAS</h5>
+      <!-- usando o v-for para usar como estrutura de repetição -->
+      <!-- v-for(todo in todos ,o index é para pegar a posição de cada um )-->
+      <div v-for="(todo,index) in todos">
+        <div class="task">
+          <div
+            v-on:click="toggleStatus(index)"
+            class="status"
+            v-bind:class="todo.status"
+          ></div>
+          <!-- o v-bind:class fica manitorando o status -->
+
+          <!-- mostrar o titulo do toDo de acordo com os dados do title -->
+          <div class="text">{{ todo.title }}</div>
+          <!-- o v-on ta chamando a função toggleModal com o valor do index que foi clicado -->
+          <img
+            v-on:click="toggleModal(index)"
+            src="imgs/lixeira.png"
+            alt="Excluir"
+            class="delete"
+          />
+        </div>
+      </div>
+
+      <div class="modal-layer" v-if="showModal">
+        <div class="modal">
+          <h4>CONFIRMA A EXCLUSÃO?</h4>
+          <p>{{ selectedTask }}</p>
+          <div class="buttons">
+            <button v-on:click="toggleModal()">CANCELAR</button>
+            <button v-on:click="removeTask">CONFIRMAR</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- aqui inicia o js com vueJs -->
+    <script>
+      // na variavel 'app' vai ser criado o new vue com um objeto dentro
+      var app = new Vue({
+        //o el vai ser o conteiner geral do Vue,
+        // tem que ter o mesmo nome do conteiner geral do html
+        //usa seletor css
+        el: "#app",
+        //no data fica os dados que  poderam ser usados no html,nesse caso são estaticos
+        // mas poderiam vir de uma api ou localStorage
+        data: {
+          name: "Gustavo Oliveira",
+          task: "",
+          selectedItem: null,
+          selectedTask: "sss",
+          //modal inicialmente em false
+          showModal: false,
+          //lista de afazeres ja com algumas informações padroes,
+          // mas que podem ser adicionadas mais ou removidas
+          //status done fica com bolinha azul o pending fica amarelo
+          todos: [
+            { title: "Aprender Vue.JS", status: "done" },
+            { title: "Aprender React", status: "pending" },
+            { title: "Aprender sobre Estrutura CDN ", status: "pending" },
+          ],
+        },
+        //methos ficam as funçoes que o template ira ultilizar
+        methods: {
+          //toggleModal é responsavel por fazer a troca de true para false e visse versa
+          //mostrando ou não o modal de deleete pegando o valor do titulo do index cliclado
+          toggleModal: function (index) {
+            this.showModal = !this.showModal;
+
+            if (index !== undefined) {
+              this.selectedItem = index;
+              this.selectedTask = this.todos[index].title;
+            }
+          },
+          //adicionando tarefa addTaks
+          addTask: function () {
+            //pegando o valor do task
+            if (this.task !== "") {
+              this.todos.push({
+                title: this.task,
+                status: "pending",
+              });
+            }
+            //depois de adc uma tarefa fazer o campo ficar vazio novamente
+            this.task = "";
+          },
+          //removendo a tarefa
+          removeTask: function () {
+            //o solice removeelementos da lista enquanto adc outros
+            this.todos.splice(this.selectedItem, 1);
+            this.showModal = false;
+          },
+          //quando clicar na bolinha de status vai alterar o status apartir do index
+          toggleStatus: function (index) {
+            this.todos[index].status =
+              this.todos[index].status === "pending" ? "done" : "pending";
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
